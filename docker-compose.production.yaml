@@ -34,5 +34,7 @@ services:
     volumes:
       - /credentials:/credentials
 
-
-  
+networks:
+  shared-network:
+    name: shared_network
+    external: true
