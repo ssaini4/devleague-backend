@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
- 
+
   web:
     build: .
     command: ./entrypoint.sh
@@ -20,7 +20,7 @@ services:
         env: GCP_LOG_LEVEL
     volumes:
       - /credentials:/credentials
-  
+
   cloud-sql-proxy:
     image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
     container_name: cloud-sql-proxy
@@ -33,6 +33,8 @@ services:
       - ./.env
     volumes:
       - /credentials:/credentials
+    networks:
+      - shared-network
 
 networks:
   shared-network:
