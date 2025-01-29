@@ -18,7 +18,6 @@ class User(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # One-to-one relationship with GitHubAuth
-    github_auth = relationship("GitHubAuth", back_populates="user", uselist=False)
     cards = relationship("Card", back_populates="user")
 
     def generate_card(self):
