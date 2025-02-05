@@ -6,9 +6,9 @@ services:
     build: .
     command: ./entrypoint.sh
     expose:
-      - 5000
+      - 6000
     ports:
-      - "5000:5000"
+      - "6000:6000"
     depends_on:
       - cloud-sql-proxy
     env_file:
@@ -20,21 +20,6 @@ services:
         env: GCP_LOG_LEVEL
     volumes:
       - /credentials:/credentials
-
-  cloud-sql-proxy:
-    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
-    container_name: cloud-sql-proxy
-    command:
-      - "--address=0.0.0.0"
-      - ${CONNECTION_NAME}
-    ports:
-      - "5432:5432"
-    env_file:
-      - ./.env
-    volumes:
-      - /credentials:/credentials
-    networks:
-      - shared-network
 
 networks:
   shared-network:
