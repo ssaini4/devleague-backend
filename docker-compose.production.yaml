@@ -9,8 +9,6 @@ services:
       - 6000
     ports:
       - "6000:6000"
-    depends_on:
-      - cloud-sql-proxy
     env_file:
       - ./.env
     logging:
@@ -20,7 +18,8 @@ services:
         env: GCP_LOG_LEVEL
     volumes:
       - /credentials:/credentials
-
+    networks:
+      - shared-network
 networks:
   shared-network:
     name: shared_network
