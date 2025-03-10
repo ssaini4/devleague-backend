@@ -158,7 +158,7 @@ class Card(Base):
             lines.append(" ".join(current_line))
 
         # Draw wrapped text
-        y = 620
+        y = 610
         line_height = font_size * 1.2  # Add some spacing between lines
         for line in lines:
             draw.text((90, y), line, font=font, fill="#fefefe")
