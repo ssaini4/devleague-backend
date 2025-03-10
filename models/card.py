@@ -1,4 +1,3 @@
-import os
 import random
 
 from dotenv import load_dotenv
@@ -13,10 +12,11 @@ from lib.llm import (
     create_contribution_description,
     create_description,
     create_issue_description,
+    CardType as LLMCardType,
 )
 from lib.storage import get_download_url, upload_image_to_bucket
 from models.db import Base
-from config import GITHUB_PAT, STAGE
+from config import GITHUB_PAT
 
 load_dotenv()
 
@@ -331,7 +331,7 @@ class Card(Base):
         else:
             # Image is taller than needed
             new_height = int(width / target_aspect_ratio)
-            top = (height - new_height) // 2
+            top = (height - new_height - 100) // 2
             bottom = top + new_height
             left = 0
             right = width
@@ -345,16 +345,18 @@ class Card(Base):
         avatar = avatar.convert("RGBA")
         image.alpha_composite(avatar, (94, 147))
 
-    def _generate_card(self, base_card: str, avatar: str):
+    def _generate_card(
+        self, base_card: str, avatar: str, card_type: LLMCardType = LLMCardType.NORMAL
+    ):
         image = Image.open(base_card)
         image = image.resize((812, 1132))
         self._add_heading(image, self.name.split(" ")[0])
         self._add_avatar(image, avatar)
         self._add_github_username(image, self.user.username)
-        self._add_description(image, create_description(self))
-        self._add_contributions(image, create_contribution_description(self))
-        self._add_comments(image, create_comment_description(self))
-        self._add_issues(image, create_issue_description(self))
+        self._add_description(image, create_description(self, card_type))
+        self._add_contributions(image, create_contribution_description(self, card_type))
+        self._add_comments(image, create_comment_description(self, card_type))
+        self._add_issues(image, create_issue_description(self, card_type))
         self.s3_uri = upload_image_to_bucket(image)
 
         return image
@@ -422,4 +424,15 @@ class PurpleCard(Card):
     def __init__(self, user: "User"):
         super().__init__(user)
         self._generate_card("static/purple.png", self._get_avatar())
+        return self
+
+
+class RoastCard(Card):
+    __mapper_args__ = {
+        "polymorphic_identity": "roast_card",
+    }
+
+    def __init__(self, user: "User"):
+        super().__init__(user)
+        self._generate_card("static/roast.png", "static/catinfire.png", LLMCardType.ROAST)
         return self

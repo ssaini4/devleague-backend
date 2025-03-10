@@ -4,7 +4,7 @@ from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from models.card import BlueCard, GreenCard, OrangeCard, PurpleCard, YellowCard
+from models.card import BlueCard, GreenCard, OrangeCard, PurpleCard, YellowCard, RoastCard
 from models.db import Base
 
 
@@ -20,17 +20,11 @@ class User(Base):
     # One-to-one relationship with GitHubAuth
     cards = relationship("Card", back_populates="user")
 
-    def generate_card(self):
+    def generate_card(self, card_type=None):
+        if card_type == "ROAST":
+            return RoastCard(self)
 
-        card_types = {1: YellowCard, 2: BlueCard, 3: OrangeCard, 4: PurpleCard, 5: GreenCard}
-
-        choice = random.randint(1, len(card_types))
-        card_class = card_types[choice]
-
-        # Check if user already has this type of card
-        existing_card = next((card for card in self.cards if isinstance(card, card_class)), None)
-        if existing_card:
-            return existing_card
-
-        # Create new card if none exists
+        # Existing random card logic for NORMAL type
+        card_classes = [YellowCard, BlueCard, GreenCard, OrangeCard, PurpleCard]
+        card_class = random.choice(card_classes)
         return card_class(self)
